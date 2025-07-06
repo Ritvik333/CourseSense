@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Feedback Platform</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0; 
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .app-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .app-header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            margin-bottom: 2rem;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .nav-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 4px;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .nav-tab.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .rating-input {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .star {
+            font-size: 2rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            user-select: none;
+        }
+
+        .star.active,
+        .star:hover {
+            color: #ffc107;
+        }
+
+        .feedback-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .feedback-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .course-badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .rating-display {
+            display: flex;
+            gap: 2px;
+        }
+
+        .rating-star {
+            color: #ffc107;
+            font-size: 1rem;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #d1edff;
+            color: #0c5460;
+            border: 1px solid #b8daff;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .app-header h1 {
+                font-size: 2rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar .form-control {
+            flex: 1;
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Welcome Page -->
+        <div id="welcomePage">
+            <div class="app-header">
+                <h1><i class="fas fa-graduation-cap"></i> Course Feedback Platform</h1>
+                <p>Connecting instructors and students through meaningful feedback</p>
+            </div>
+            <div class="card">
+                <div class="nav-tabs">
+                    <div class="nav-tab active" onclick="switchTab('login')">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </div>
+                    <div class="nav-tab" onclick="switchTab('register')">
+                        <i class="fas fa-user-plus"></i> Register
+                    </div>
+                </div>
+
+                <!-- Login Tab -->
+                <div id="loginTab" class="tab-content active">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="loginRole">I am a:</label>
+                            <select id="loginRole" class="form-control" required>
+                                <option value="">Select your role</option>
+                                <option value="instructor">📚 Instructor</option>
+                                <option value="student">🎓 Student</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginUsername">Username:</label>
+                            <input type="text" id="loginUsername" class="form-control" placeholder="Enter your username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password:</label>
+                            <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                    </form>
+                    <div id="loginMessage"></div>
+                    <div id="mfaForm" style="display: none;">
+                        <form id="mfaFormSubmit">
+                            <div class="form-group">
+                                <label for="mfaCode">MFA Code:</label>
+                                <input type="text" id="mfaCode" class="form-control" placeholder="Enter MFA code" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <i class="fas fa-shield-alt"></i> Verify MFA
+                            </button>
+                        </form>
+                    </div>
+                    <div id="newPasswordForm" style="display: none;">
+                        <form id="newPasswordFormSubmit">
+                            <div class="form-group">
+                                <label for="newPassword">New Password:</label>
+                                <input type="password" id="newPassword" class="form-control" placeholder="Enter new password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                <i class="fas fa-lock"></i> Set New Password
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Register Tab -->
+                <div id="registerTab" class="tab-content">
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="registerRole">I am a:</label>
+                            <select id="registerRole" class="form-control" required>
+                                <option value="">Select your role</option>
+                                <option value="instructor">📚 Instructor</option>
+                                <option value="student">🎓 Student</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerUsername">Username:</label>
+                            <input type="text" id="registerUsername" class="form-control" placeholder="Choose a username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPassword">Password:</label>
+                            <input type="password" id="registerPassword" class="form-control" placeholder="Create a password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-user-plus"></i> Create Account
+                        </button>
+                    </form>
+                    <div id="registerMessage"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div id="dashboardPage" style="display: none;">
+            <div class="user-info">
+                <div class="avatar">
+                    <i id="userIcon" class="fas fa-user"></i>
+                </div>
+                <div>
+                    <h3>Welcome back!</h3>
+                    <p>You're logged in as <strong id="userRole"></strong></p>
+                </div>
+                <div style="margin-left: auto;">
+                    <button class="btn btn-secondary" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </div>
+            </div>
+
+            <!-- Student Dashboard -->
+            <div id="studentDashboard">
+                <div class="card">
+                    <h2><i class="fas fa-comment-alt"></i> Submit Course Feedback</h2>
+                    <form id="submitForm">
+                        <div class="form-group">
+                            <label for="studentId">Student ID:</label>
+                            <input type="text" id="studentId" class="form-control" placeholder="e.g., S12345" required>
+                            <label for="courseId">Course ID:</label>
+                            <input type="text" id="courseId" class="form-control" placeholder="e.g., CS101, MATH201" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Rating:</label>
+                            <div class="rating-input" id="ratingInput">
+                                <span class="star" data-rating="1">★</span>
+                                <span class="star" data-rating="2">★</span>
+                                <span class="star" data-rating="3">★</span>
+                                <span class="star" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                            </div>
+                            <input type="hidden" id="rating" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="comment">Your Feedback:</label>
+                            <textarea id="comment" class="form-control" rows="4" placeholder="Share your thoughts about the course..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Submit Feedback
+                        </button>
+                    </form>
+                    <div id="submitMessage"></div>
+                </div>
+            </div>
+
+            <!-- Instructor Dashboard -->
+            <div id="instructorDashboard">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalFeedbacks">0</div>
+                        <div>Total Feedbacks</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="avgRating">0.0</div>
+                        <div>Average Rating</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalCourses">0</div>
+                        <div>Courses</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2><i class="fas fa-search"></i> Query Feedback</h2>
+                    <div class="filter-bar">
+                        <input type="text" id="courseFilter" class="form-control" placeholder="Filter by Course ID (optional)">
+                        <button class="btn btn-primary" onclick="queryFeedback()">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearFilters()">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+                    
+                    <div class="loading" id="queryLoading">
+                        <div class="spinner"></div>
+                        <p>Loading feedback...</p>
+                    </div>
+                    
+                    <div id="queryResults"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let currentRating = 0;
+        let session = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuthStatus();
+            initializeRatingSystem();
+        });
+
+        function checkAuthStatus() {
+            const role = localStorage.getItem('role');
+            const username = localStorage.getItem('username');
+            if (role && username) {
+                currentUser = { role, username };
+                showDashboard();
+            }
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.getElementById(tab + 'Tab').classList.add('active');
+            if (tab === 'login') {
+                document.getElementById('mfaForm').style.display = 'none';
+                document.getElementById('newPasswordForm').style.display = 'none';
+            }
+        }
+
+        function initializeRatingSystem() {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    currentRating = parseInt(this.dataset.rating);
+                    document.getElementById('rating').value = currentRating;
+                    updateStarDisplay();
+                });
+                star.addEventListener('mouseenter', function() {
+                    const hoverRating = parseInt(this.dataset.rating);
+                    stars.forEach((s, index) => s.classList.toggle('active', index < hoverRating));
+                });
+            });
+            document.getElementById('ratingInput').addEventListener('mouseleave', updateStarDisplay);
+        }
+
+        function updateStarDisplay() {
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => star.classList.toggle('active', index < currentRating));
+        }
+
+        function showMessage(elementId, message, type = 'success') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="message ${type}">${message}</div>`;
+            setTimeout(() => element.innerHTML = '', 5000);
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = {
+                role: document.getElementById('loginRole').value,
+                username: document.getElementById('loginUsername').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                console.log("index result: ",result);
+
+                if (!result.success) {
+                    if (result.message === 'New password required') {
+                        session = result.session;
+                        document.getElementById('loginForm').style.display = 'none';
+                        document.getElementById('newPasswordForm').style.display = 'block';
+                    } else if (result.message === 'MFA required') {
+                        session = result.session;
+                        document.getElementById('loginForm').style.display = 'none';
+                        document.getElementById('mfaForm').style.display = 'block';
+                    } else {
+                        showMessage('loginMessage', result.message, 'error');
+                    }
+                } else {
+                    localStorage.setItem('role', result.role);
+                    localStorage.setItem('sessionId', result.sessionId);
+                    localStorage.setItem('username', data.username);
+                    currentUser = { role: result.role, username: data.username };
+                    showMessage('loginMessage', 'Login successful! Redirecting...', 'success');
+                    setTimeout(showDashboard, 1000);
+                }
+            } catch (error) {
+                showMessage('loginMessage', 'Network error. Please try again.', 'error');
+            }
+        });
+
+        document.getElementById('newPasswordFormSubmit').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = {
+                username: document.getElementById('loginUsername').value,
+                new_password: document.getElementById('newPassword').value,
+                session
+            };
+
+            try {
+                const response = await fetch('/set-new-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    localStorage.setItem('role', result.role);
+                    localStorage.setItem('username', data.username);
+                    currentUser = { role: result.role, username: data.username };
+                    document.getElementById('newPasswordForm').style.display = 'none';
+                    document.getElementById('loginForm').style.display = 'block';
+                    showMessage('loginMessage', 'Password set! Logging in...', 'success');
+                    setTimeout(showDashboard, 1000);
+                } else {
+                    showMessage('loginMessage', result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('loginMessage', 'Network error. Please try again.', 'error');
+            }
+        });
+
+        document.getElementById('mfaFormSubmit').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = {
+                username: document.getElementById('loginUsername').value,
+                mfa_code: document.getElementById('mfaCode').value,
+                session
+            };
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'mfa', ...data })
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    localStorage.setItem('role', result.role);
+                    localStorage.setItem('username', data.username);
+                    currentUser = { role: result.role, username: data.username };
+                    document.getElementById('mfaForm').style.display = 'none';
+                    document.getElementById('loginForm').style.display = 'block';
+                    showMessage('loginMessage', 'MFA verified! Logging in...', 'success');
+                    setTimeout(showDashboard, 1000);
+                } else {
+                    showMessage('loginMessage', result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('loginMessage', 'Network error. Please try again.', 'error');
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = {
+                role: document.getElementById('registerRole').value,
+                username: document.getElementById('registerUsername').value,
+                password: document.getElementById('registerPassword').value
+            };
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('registerMessage', 'Registration successful! Please verify your email and login.', 'success');
+                    setTimeout(() => switchTab('login'), 2000);
+                    document.getElementById('registerForm').reset();
+                } else {
+                    showMessage('registerMessage', result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('registerMessage', 'Network error. Please try again.', 'error');
+            }
+        });
+
+        document.getElementById('submitForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (currentRating === 0) {
+                showMessage('submitMessage', 'Please select a rating.', 'error');
+                return;
+            }
+
+            const data = {
+                StudentID: document.getElementById('studentId').value,
+                CourseID: document.getElementById('courseId').value,
+                Rating: currentRating,
+                Comment: document.getElementById('comment').value
+            };
+
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                showMessage('submitMessage', 'Feedback submitted successfully!', 'success');
+                document.getElementById('submitForm').reset();
+                currentRating = 0;
+                updateStarDisplay();
+            } catch (error) {
+                showMessage('submitMessage', 'Error submitting feedback. Please try again.', 'error');
+            }
+        });
+
+        function showDashboard() {
+            document.getElementById('welcomePage').style.display = 'none';
+            document.getElementById('dashboardPage').style.display = 'block';
+            const role = currentUser.role;
+            document.getElementById('userRole').textContent = role;
+            document.getElementById('userIcon').className = role === 'instructor' ? 'fas fa-chalkboard-teacher' : 'fas fa-user-graduate';
+            document.getElementById('studentDashboard').style.display = role === 'student' ? 'block' : 'none';
+            document.getElementById('instructorDashboard').style.display = role === 'instructor' ? 'block' : 'none';
+            if (role === 'instructor') queryFeedback();
+        }
+
+        async function queryFeedback() {
+            if (currentUser.role !== 'instructor') return;
+            const courseFilter = document.getElementById('courseFilter').value;
+            const loading = document.getElementById('queryLoading');
+            const results = document.getElementById('queryResults');
+            loading.style.display = 'block';
+            results.innerHTML = '';
+            try {
+                const response = await fetch(`/query?course=${courseFilter}`);
+                const text = await response.text();
+                let data = JSON.parse(text);
+                loading.style.display = 'none';
+                displayFeedback(data);
+                updateStats(data);
+            } catch (error) {
+                console.error('Query error:', error);
+                loading.style.display = 'none';
+                results.innerHTML = `<div class="message error">Error loading feedback: ${error.message}</div>`;
+            }
+        }
+
+        function displayFeedback(data) {
+            const results = document.getElementById('queryResults');
+            if (!data || !data.results || data.results.length === 0) {
+                results.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-comment-slash"></i>
+                        <h3>No feedback found</h3>
+                        <p>No feedback matches your current filters.</p>
+                    </div>
+                `;
+                return;
+            }
+            const feedbackHtml = data.results.map(feedback => {
+                const [CourseID, AverageRating] = feedback;
+                return `
+                    <div class="feedback-card">
+                        <div class="feedback-header">
+                            <span class="course-badge">${CourseID}</span>
+                            <div class="rating-display">${generateStarRating(parseFloat(AverageRating))}</div>
+                        </div>
+                        <p><strong>Average Rating:</strong> ${AverageRating}/5</p>
+                        <small class="text-muted"><i class="fas fa-clock"></i> Calculated average</small>
+                    </div>
+                `;
+            }).join('');
+            results.innerHTML = feedbackHtml;
+        }
+
+        function generateStarRating(rating) {
+            const stars = [];
+            for (let i = 1; i <= 5; i++) stars.push(`<span class="rating-star ${i <= rating ? '' : 'text-muted'}">★</span>`);
+            return stars.join('');
+        }
+
+        function updateStats(data) {
+            if (!data || !data.results || data.results.length === 0) {
+                document.getElementById('totalFeedbacks').textContent = '0';
+                document.getElementById('avgRating').textContent = '0.0';
+                document.getElementById('totalCourses').textContent = '0';
+                return;
+            }
+            const results = data.results;
+            const totalFeedbacks = results.reduce((sum, [_, rating]) => sum + 1, 0);
+            const avgRating = results.reduce((sum, [_, rating]) => sum + parseFloat(rating), 0) / results.length;
+            const totalCourses = results.length;
+            document.getElementById('totalFeedbacks').textContent = totalFeedbacks;
+            document.getElementById('avgRating').textContent = avgRating.toFixed(1);
+            document.getElementById('totalCourses').textContent = totalCourses;
+        }
+
+        function clearFilters() {
+            document.getElementById('courseFilter').value = '';
+            queryFeedback();
+        }
+
+        function logout() {
+        const sessionId = localStorage.getItem('sessionId');
+        if (sessionId) {
+            fetch(`/logout?sessionId=${encodeURIComponent(sessionId)}`, { method: 'GET' })
+                .then(response => {
+                    if (response.ok) {
+                        localStorage.removeItem('role');
+                        localStorage.removeItem('username');
+                        localStorage.removeItem('sessionId');
+                        currentUser = null;
+                        document.getElementById('welcomePage').style.display = 'block';
+                        document.getElementById('dashboardPage').style.display = 'none';
+                        document.getElementById('loginForm').reset();
+                        document.getElementById('registerForm').reset();
+                        if (document.getElementById('submitForm')) document.getElementById('submitForm').reset();
+                        currentRating = 0;
+                        updateStarDisplay();
+                    }
+                })
+                .catch(error => console.error('Logout error:', error));
+        } else {
+            console.log('No sessionId available for logout');
+            localStorage.removeItem('role');
+            localStorage.removeItem('username');
+            localStorage.removeItem('sessionId');
+            currentUser = null;
+            document.getElementById('welcomePage').style.display = 'block';
+            document.getElementById('dashboardPage').style.display = 'none';
+            document.getElementById('loginForm').reset();
+            document.getElementById('registerForm').reset();
+            if (document.getElementById('submitForm')) document.getElementById('submitForm').reset();
+            currentRating = 0;
+            updateStarDisplay();
+        }
+    }
+    </script>
+</body>
+</html>
