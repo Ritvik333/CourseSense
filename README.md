@@ -63,7 +63,7 @@ API Gateway is integrated with AWS WAF for rate limiting and protection from com
 | Data Store   | Amazon RDS (MySQL), S3       |
 | Analytics    | Amazon Athena                |
 | Monitoring   | CloudWatch, CloudTrail       |
-| Security     | Secrets Manager, KMS, WAF    |
+| Security     | VPC, Secrets Manager, KMS, WAF    |
 | Deployment   | Terraform, AWS CLI           |
 
 ---
